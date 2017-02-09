@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>进度条</title>
+	<style>
+       #bg{
+/*        	width:200px;
+height:15px;
+border: 1px solid red; */
+       	margin: 100px 100px;
+       }
+       #prosess{
+/*        	height:15px;
+       background-color: blue;
+        */       }
+	</style>
+</head>
+<body>
+	<div id="bg">
+		<div id='prosess'></div>
+	</div>
+	<script>
+/*	function pro(ela,elb){
+	   var bg=document.getElementById(ela);
+       var prosess=document.getElementById(elb);
+       var timer=null;
+       var wid=prosess.style.width=0;
+       var num=parseInt(wid);
+       console.log(wid);
+       clearInterval(timer);
+       function fn(){
+       	if(num<200){
+       		num+=2; 
+       		prosess.style.width=num+'px';
+       		console.log(num);
+       	}
+       	else if(num==200) {
+       		clearInterval(timer);
+       		prosess.style.width=200+'px';
+
+       	}
+       }
+       timer=setInterval(fn,1000);
+	}
+
+    pro('bg','prosess');*/
+
+    function pro(){
+    	this.init.apply(this,arguments);
+    }
+    pro.prototype={
+    	init: function(ela,elb,paramObj){
+    		   this.defaultOptions={
+    		   	  backgroundColor:'red',
+    		   	  widthProsess:'50px',
+    		   	  width:'200px',
+    		   	  height:'15px',
+    		   	  border:'1px solid red',
+    		   	  step:'2',
+    		   	  delay:100
+    		   };
+    		   this.options=this.extend(this.defaultOptions,paramObj||{});
+    		   this.bg=document.getElementById(ela);
+    		   this.prosess=document.getElementById(elb);
+    		   this.wid=prosess.style.width=this.options.widthProsess;
+    		   this.num=parseInt(this.wid);
+    		   this.timer=null;
+    		   this.bg.style.width=this.options.width;
+    		   this.bg.style.height=this.options.height;
+    		   this.bg.style.border=this.options.border;
+    		   this.prosess.style.backgroundColor=this.options.backgroundColor;
+    		   this.prosess.style.height=this.options.height;
+    		   this.optionsNum=parseInt(this.options.width);
+               window.onload=this.prosesses();    	
+   		},
+    	extend:function(source,target){
+    		for(var p in target){
+    			if(target.hasOwnProperty(p)){
+    				source[p]=target[p];
+    			}
+    		}
+    		return source;
+    	},
+        prosesses:function(){
+        	var self=this;   //定时器的this指向window 所以用self来指定this
+             timer=setInterval(function(){
+             	if(self.num<self.optionsNum){
+             		self.num+=self.options.step;
+             		self.prosess.style.width=self.num+'px';
+             	}else if(self.num>self.optionsNum||self.num==self.optionsNum){
+             		self.wid=self.options.width+'px';
+             		clearInterval(timer);
+             	}
+             	console.log(self.prosess.style.width);
+
+             },self.options.delay)
+
+        }
+    };
+    a=new pro('bg','prosess',{
+        		  backgroundColor:'blue',
+        		  widthProsess:'30px',
+    		   	  width:'500px',
+    		   	  height:'20px',
+    		   	  border:'2px solid green',
+    		   	  step:2,
+    		   	  delay:50	
+    });
+
+    console.log(a);
+	</script>
+</body>
+</html>

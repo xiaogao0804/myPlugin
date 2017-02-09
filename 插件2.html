@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>tab切换</title>
+	<style>
+       ul{
+       	list-style-type: none;
+       }
+       ul li{
+       	float: left;
+       	color: #000;
+       	padding:3px 12px;
+       	border:1px solid blue;
+       	cursor: pointer;
+       }
+       ul .current{
+       	color:red;
+       }
+       #tabs{
+       	width:230px;
+       	height:203px;
+       	margin-left: 40px;
+       	overflow: hidden;
+       }
+      .tab_items{
+       	width: 228px;
+       	height:200px;
+       	border: 1px solid red;      	
+       }
+       #tabs .off{
+       	display:none;
+       }
+       .clear{
+       	clear:both;
+       }
+	</style>
+</head>
+<body>
+	<ul id="tab_nav">
+		<li class="current">新闻</li>
+		<li>生活</li>
+		<li>体育</li>
+		<li>抽奖</li>
+	</ul>
+	<div class="clear"></div>
+	<div id="tabs">
+		<div class="tab_items">新闻</div>
+		<div class="tab_items off">生活</div>
+		<div class="tab_items off">体育</div>
+		<div class="tab_items off">抽奖</div>
+	</div>
+	<script>
+	//构造函数，以后每一个tab选项卡的实例都是由他来实例化的
+      function Tab(){
+      	this.init.apply(this,arguments);//用init函数初始化对象属性
+      }
+      //对象原型  这里主要是一些功能方法
+      Tab.prototype={
+      	init:function(ela,elb,paramObj){
+      		//默认参数设置，triggerClass:当前选项的class名字，type:鼠标事件，delay：这个主要针对mouseover快速划过去的一个延时处理
+      		this.defaultOptions={    //1.先实现一个初始化的功能
+      			triggerClass:'current',
+      			type:'mouseover',
+      			delay:150
+      		};
+      		this.options=this.extend(this.defaultOptions,paramObj||{});   //2.将实例的功能覆盖初始化功能
+      		this.oa=document.getElementById(ela);  //3.获取需要的元素
+      		this.ob=document.getElementById(elb);
+      		this.triggerItem=this.oa.children;
+      		this.listItem=this.ob.children;
+      		this.tLen=this.triggerItem.length;
+      		this.arr=[];
+      		this.timer=null;
+      		this.isIE=!-[1,];//判断IE浏览器
+      		var self=this;
+      		//当type为click时，就无延时，反之则延时
+      		this.options.delay=this.options.type==='click'?0:this.options.delay;
+      		//IE下过滤注释节点
+      		if(this.isIE){
+      			for(var i=0;i<this.listItem.length;i++){
+      				if(this.listItem[i].nodeType==1){   //如果是元素
+      					this.arr.push(this.listItem[i]);
+      				}
+      				
+      			}
+      		}
+      	  //绑定事件
+      	  for(var i=0;i<this.tLen;i++){          //4.绑定事件
+      	  	this.triggerItem[i]['on'+this.options.type]=this.change(i);//绑定事件
+      	  	this.triggerItem[i].onmouseout=function(){clearTimeout(self.timer);self.timer=null;};//绑定事件
+      	  }
+      	},
+      	extend:function(source,target){  //属性合并处理
+      		for(var p in target){   //遍历目标元素的可枚举属性
+      			if(target.hasOwnProperty(p)){     //判断目标元素是否有p属性
+      				source[p]=target[p];
+      			}
+      		}
+      		return source;
+      	},
+      	trim:function(str){
+      		return str.replace(/^\s+/g, '').replace(/\s+$/g, '');//去除字符串的前后空格
+      	},
+      	addClass:function(el,name){  //定义添加class函数  addClass(元素对象，class名字)
+      		var arr=[],
+      		    str=el.className,//获取元素的类名
+      		    arr=str.split(/\s+/),//将字符串类名转换为数组并以空格隔开
+      		    len=arr.length,
+      		    name=this.trim(name);
+      		    for(var i=0;i<len;i++){
+      		    	if(arr[i]===name){   //如果数组里面的类名等于指定的类名 就返回出来
+      		    		return;
+      		    	}
+
+      		    } 
+      		    arr.splice(len,1,name);//删除数组末尾的一个class类名 并添加新的类名name
+      		    //将类名的数组转换为以空格间隔的字符串并且去掉前后空格
+      			el.className=this.trim(arr.join(' '));
+      			el=null;
+      	},
+      	removeClass:function(el,name){  //定义移除class函数  removeClass(元素对象，class名字)
+      		var arr=[],
+      		str=el.className,
+      		arr=str.split(/\s+/),
+      		len=arr.length,
+      		name=this.trim(name);
+      		for(var i=0;i<len;i++){
+      			if(arr[i]===name){
+      				arr.splice(i,1);
+      				el.className=arr.join(' ');
+      				return;
+      			}
+      		}
+      	},
+      	change:function(d){//选项卡实现
+      		var self=this;
+      		return function(){
+      			self.timer=setTimeout(function(){
+      				for(var i=0;i<self.tLen;i++){
+      					if(i===d){
+      						self.addClass(self.triggerItem[d],self.options.triggerClass);
+      						self.isIE?self.arr[d].style.display='block':self.listItem[i].style.display='block';
+      					}
+      					else{
+      						self.removeClass(self.triggerItem[i],self.options.triggerClass);
+      						self.isIE?self.arr[i].style.display='none':self.listItem[i].style.display='none';
+      					}
+      				}
+      			},self.options.delay);
+      		}
+      	}
+
+      }
+      new Tab('tab_nav','tabs',{type:'click'});
+    /*  new Tab('tab_nav2','tabs2',{triggerClass:'trigger'});
+      new Tab('tab_nav3','tabs3',{type:'mouseover',delay:200});*/
+	</script>
+</body>
+</html>
